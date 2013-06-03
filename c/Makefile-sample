@@ -1,0 +1,89 @@
+
+# NUMBER 1
+#
+# This version simply rebuilds everthing everytime
+#
+# hellomake: hellomake.c hellofunc.c
+#	gcc -o hellomake hellomake.c hellofunc.c -I.
+#
+#
+
+# NUMBER 2
+#
+# This version only builds things that have changed
+#
+#CC=cc
+#CFLAGS=-I.
+#
+#hellomake: hellomake.o hellofunc.o
+#	$(CC)  -o hellomake hellomake.o hellofunc.o -I.
+
+# NUMBER 3
+#
+# This version handles .h dependencies but is still not generic
+#
+#CC=cc
+#CFLAGS=-I.
+#DEPS = hellomake.h
+#
+#%.o: %.c $(DEPS)
+#	$(CC) -c -o $@ $< $(CFLAGS)
+#
+#hellomake: hellomake.o hellofunc.o
+#	$(CC)  -o hellomake hellomake.o hellofunc.o -I.
+
+# NUMBER 4
+
+# This one uses $@ and $^ to be more general
+#
+#CC=cc
+#CFLAGS=-I.
+#DEPS = hellomake.h
+#OBJ = hellomake.o hellofunc.o
+#
+#%.o: %.c $(DEPS)
+#	$(CC) -c -o $@ $< $(CFLAGS)
+#
+#hellomake: $(OBJ)
+#	$(CC)  -o $@ $^ $(CFLAGS)
+
+# NUMBER 5
+
+# The full monty
+
+IDIR =../include
+CC=cc
+CFLAGS=-I$(IDIR)
+
+ODIR=obj
+LDIR=../lib
+
+LIBS=-lm
+
+_DEPS = hellomake.h
+DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+
+_OBJ = hellomake.o hellofunc.o
+OBJ = $(patsubst %,$(IDIR)/%,$(_OBJ))
+
+$(ODIR)/%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+hellomake: $(OBJ)
+	$(CC)  -o $@ $^ $(CFLAGS) $(LIBS)
+
+.PHONY: clean
+
+clean:
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~
+
+
+
+
+
+
+
+
+
+
+
